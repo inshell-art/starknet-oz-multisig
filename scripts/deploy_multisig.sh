@@ -9,21 +9,23 @@ ACCOUNT="${ACCOUNT:-}"
 ACCOUNTS_FILE="${ACCOUNTS_FILE:-}"
 OUT_DIR="${OUT_DIR:-}"
 QUORUM="${QUORUM:-2}"
-LABEL="both"
-SIGNERS_ARG=""
-ADMIN_SIGNERS_ARG="${ADMIN_SIGNERS:-}"
-TREASURY_SIGNERS_ARG="${TREASURY_SIGNERS:-}"
+LABEL="${MULTISIG_LABEL:-primary}"
+SIGNERS_ARG="${SIGNERS:-}"
 FORCE_DECLARE="${FORCE_DECLARE:-0}"
 
 usage() {
   cat <<EOF
-Usage: deploy_multisig.sh [--label admin|treasury|both] [--quorum N] [--signers addr1,addr2] \
-                         [--admin-signers addr1,addr2] [--treasury-signers addr1,addr2]
+Usage: deploy_multisig.sh [--label <name>] [--quorum N] [--signers addr1,addr2]
 
 Env vars:
   NETWORK, RPC, ACCOUNT, ACCOUNTS_FILE, OUT_DIR, QUORUM
-  SIGNERS (for single label), ADMIN_SIGNERS, TREASURY_SIGNERS
+  SIGNERS (comma separated addresses)
+  MULTISIG_LABEL (default label if --label not provided)
   FORCE_DECLARE=1 to redeclare even if class_hash exists
+
+Notes:
+  Run this script multiple times with different --label values to deploy
+  multiple multisig instances.
 EOF
 }
 
@@ -32,8 +34,6 @@ while [[ $# -gt 0 ]]; do
     --label) LABEL="$2"; shift 2;;
     --quorum) QUORUM="$2"; shift 2;;
     --signers) SIGNERS_ARG="$2"; shift 2;;
-    --admin-signers) ADMIN_SIGNERS_ARG="$2"; shift 2;;
-    --treasury-signers) TREASURY_SIGNERS_ARG="$2"; shift 2;;
     -h|--help) usage; exit 0;;
     *) echo "Unknown arg: $1"; usage; exit 1;;
   esac
@@ -41,6 +41,12 @@ done
 
 if [[ -z "$RPC" || -z "$ACCOUNT" || -z "$ACCOUNTS_FILE" ]]; then
   echo "Missing RPC, ACCOUNT, or ACCOUNTS_FILE env vars." >&2
+  usage
+  exit 1
+fi
+
+if [[ -z "$SIGNERS_ARG" ]]; then
+  echo "Missing SIGNERS env var or --signers argument." >&2
   usage
   exit 1
 fi
@@ -72,15 +78,12 @@ PY
 fi
 
 if [[ -z "$CLASS_HASH" || "$FORCE_DECLARE" == "1" ]]; then
-  DECLARE_JSON=$(sncast --account "$ACCOUNT" --accounts-file "$ACCOUNTS_FILE" --json declare \
-    --package multisig_wallet --contract-name MultisigWallet \
-    --url "$RPC")
+  DECLARE_JSON=$(sncast --account "$ACCOUNT" --accounts-file "$ACCOUNTS_FILE" --json declare     --package multisig_wallet --contract-name MultisigWallet     --url "$RPC")
 
   CLASS_HASH=$(echo "$DECLARE_JSON" | python3 -c 'import json,sys; print(json.load(sys.stdin)["class_hash"])')
   DECLARE_TX=$(echo "$DECLARE_JSON" | python3 -c 'import json,sys; print(json.load(sys.stdin)["transaction_hash"])')
 
-  ROOT_DIR="$ROOT_DIR" NETWORK="$NETWORK" CLASS_HASH="$CLASS_HASH" DECLARE_TX="$DECLARE_TX" CLASS_FILE="$CLASS_FILE" \
-  python3 - <<'PY'
+  ROOT_DIR="$ROOT_DIR" NETWORK="$NETWORK" CLASS_HASH="$CLASS_HASH" DECLARE_TX="$DECLARE_TX" CLASS_FILE="$CLASS_FILE"   python3 - <<'PY'
 import json
 import os
 from datetime import datetime, timezone
@@ -96,7 +99,8 @@ payload = {
     "declare_tx": os.environ["DECLARE_TX"],
     "declared_at": datetime.now(timezone.utc).isoformat(),
 }
-class_file.write_text(json.dumps(payload, indent=2) + "\n")
+class_file.write_text(json.dumps(payload, indent=2) + "
+")
 PY
 fi
 
@@ -122,9 +126,7 @@ label_deploy() {
   salt=$("$ROOT_DIR/scripts/salt.sh")
 
   local deploy_json
-  deploy_json=$(sncast --account "$ACCOUNT" --accounts-file "$ACCOUNTS_FILE" --json deploy \
-    --class-hash "$CLASS_HASH" --url "$RPC" --salt "$salt" \
-    --constructor-calldata "$QUORUM" "$count" "${signers[@]}")
+  deploy_json=$(sncast --account "$ACCOUNT" --accounts-file "$ACCOUNTS_FILE" --json deploy     --class-hash "$CLASS_HASH" --url "$RPC" --salt "$salt"     --constructor-calldata "$QUORUM" "$count" "${signers[@]}")
 
   local address
   local tx_hash
@@ -132,9 +134,7 @@ label_deploy() {
   tx_hash=$(echo "$deploy_json" | python3 -c 'import json,sys; print(json.load(sys.stdin)["transaction_hash"])')
 
   local out_file="$OUT_DIR/multisig.${label}.json"
-  ROOT_DIR="$ROOT_DIR" NETWORK="$NETWORK" LABEL="$label" CLASS_HASH="$CLASS_HASH" ADDRESS="$address" DEPLOY_TX="$tx_hash" \
-    QUORUM="$QUORUM" SIGNERS_RAW="$raw_signers" OUT_FILE="$out_file" \
-    python3 - <<'PY'
+  ROOT_DIR="$ROOT_DIR" NETWORK="$NETWORK" LABEL="$label" CLASS_HASH="$CLASS_HASH" ADDRESS="$address" DEPLOY_TX="$tx_hash"     QUORUM="$QUORUM" SIGNERS_RAW="$raw_signers" OUT_FILE="$out_file"     python3 - <<'PY'
 import json
 import os
 from datetime import datetime, timezone
@@ -157,7 +157,8 @@ payload = {
 }
 
 out_file = Path(os.environ["OUT_FILE"])
-out_file.write_text(json.dumps(payload, indent=2) + "\n")
+out_file.write_text(json.dumps(payload, indent=2) + "
+")
 PY
 
   cat <<REPORT
@@ -169,30 +170,4 @@ Deployed MultisigWallet [$label]
 REPORT
 }
 
-case "$LABEL" in
-  admin)
-    if [[ -z "$SIGNERS_ARG" ]]; then
-      SIGNERS_ARG="$ADMIN_SIGNERS_ARG"
-    fi
-    label_deploy "admin" "$SIGNERS_ARG"
-    ;;
-  treasury)
-    if [[ -z "$SIGNERS_ARG" ]]; then
-      SIGNERS_ARG="$TREASURY_SIGNERS_ARG"
-    fi
-    label_deploy "treasury" "$SIGNERS_ARG"
-    ;;
-  both)
-    if [[ -z "$ADMIN_SIGNERS_ARG" || -z "$TREASURY_SIGNERS_ARG" ]]; then
-      echo "ADMIN_SIGNERS and TREASURY_SIGNERS are required for label=both." >&2
-      exit 1
-    fi
-    label_deploy "admin" "$ADMIN_SIGNERS_ARG"
-    label_deploy "treasury" "$TREASURY_SIGNERS_ARG"
-    ;;
-  *)
-    echo "Invalid label: $LABEL" >&2
-    usage
-    exit 1
-    ;;
-esac
+label_deploy "$LABEL" "$SIGNERS_ARG"

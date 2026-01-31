@@ -9,17 +9,19 @@
 
 ## Deploy instances
 
-Admin multisig:
-- [ ] Address: ______________________________
-- [ ] Deploy tx: ____________________________
+Multisig instance:
+- [ ] Label: ______________________________
+- [ ] Address: ____________________________
+- [ ] Deploy tx: __________________________
 - [ ] Quorum: ________
-- [ ] Signers: ______________________________
+- [ ] Signers: ____________________________
 
-Treasury multisig:
-- [ ] Address: ______________________________
-- [ ] Deploy tx: ____________________________
+Optional additional multisig instance:
+- [ ] Label: ______________________________
+- [ ] Address: ____________________________
+- [ ] Deploy tx: __________________________
 - [ ] Quorum: ________
-- [ ] Signers: ______________________________
+- [ ] Signers: ____________________________
 
 Example Counter:
 - [ ] Address: ______________________________
@@ -29,7 +31,7 @@ Example Counter:
 ## Artifacts
 
 - [ ] `artifacts/<network>/multisig.class.json` updated
-- [ ] `artifacts/<network>/multisig.admin.json` updated
-- [ ] `artifacts/<network>/multisig.treasury.json` updated
+- [ ] `artifacts/<network>/multisig.<label>.json` updated
+- [ ] (if applicable) additional `artifacts/<network>/multisig.<label>.json` updated
 - [ ] `artifacts/<network>/counter.class.json` updated
 - [ ] `artifacts/<network>/counter.json` updated

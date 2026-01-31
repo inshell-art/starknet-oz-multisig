@@ -17,3 +17,7 @@ workbook/runs/**
 *.key
 *.pem
 keystore*.json
+
+# macOS
+.DS_Store
+

@@ -9,11 +9,11 @@ ACCOUNTS_FILE="${ACCOUNTS_FILE:-}"
 OUT_DIR="${OUT_DIR:-}"
 SIGNER_A="${SIGNER_A:-}"
 SIGNER_B="${SIGNER_B:-}"
-LABEL="${MULTISIG_LABEL:-admin}"
+LABEL="${MULTISIG_LABEL:-primary}"
 
 usage() {
   cat <<EOF
-Usage: rehearse_counter_flow.sh [--label admin|treasury]
+Usage: rehearse_counter_flow.sh [--label <name>]
 
 Env vars:
   NETWORK, RPC, ACCOUNTS_FILE, OUT_DIR, SIGNER_A, SIGNER_B, MULTISIG_LABEL

@@ -44,16 +44,16 @@ Deploy the example Counter (devnet or testnet):
 ./scripts/deploy_example_counter.sh
 ```
 
-Deploy multisig instances (ADMIN + TREASURY):
+Deploy a multisig instance:
 
 ```bash
-./scripts/deploy_multisig.sh --label both
+./scripts/deploy_multisig.sh --label primary
 ```
 
 Rehearse the flow against the Counter:
 
 ```bash
-./scripts/rehearse_counter_flow.sh --label admin
+./scripts/rehearse_counter_flow.sh --label primary
 ```
 
 Artifacts are written to `artifacts/<network>` (default: `artifacts/devnet`).

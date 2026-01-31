@@ -16,16 +16,13 @@ export ACCOUNTS_FILE="$HOME/.starknet_accounts/devnet_oz_accounts.json"
 export OUT_DIR=""
 
 # Multisig deploy inputs
-# For label=admin|treasury: use SIGNERS (comma separated addresses).
-# For label=both: set ADMIN_SIGNERS and TREASURY_SIGNERS instead.
+# Use --label to name the instance (used in artifact filenames).
 export SIGNERS="0xabc,0xdef"
-export ADMIN_SIGNERS="0xabc,0xdef"
-export TREASURY_SIGNERS="0xabc,0xdef"
 export QUORUM=2
 
 # Rehearsal signers (account names) - must match the signer addresses above
 export SIGNER_A=signer_a
 export SIGNER_B=signer_b
 
-# Optional override for multisig label used by rehearsal (admin|treasury)
-export MULTISIG_LABEL=admin
+# Optional label used by deploy/rehearsal scripts
+export MULTISIG_LABEL=primary
