@@ -74,7 +74,7 @@ Each action is a separate on-chain transaction:
 
 ## Docs
 
-- Runbook: `workbook/00-runbook.md`
+- Runbook: `ops/runbooks/00-runbook.md`
 - Deploy checklist: `workbook/10-deploy.md`
 - Rehearsal checklist: `workbook/20-rehearsal-counter.md`
 - Run logs template: `workbook/runs/run-YYYYMMDD.md`

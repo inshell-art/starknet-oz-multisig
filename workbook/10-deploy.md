@@ -1,17 +1,20 @@
-# Deploy checklist
+# Run log: Deploy
 
-## Inputs (fill before running scripts)
+Procedure: `ops/runbooks/lane2-deploy.md`
 
-- [ ] Network: __________________________
-- [ ] RPC: ______________________________
-- [ ] Deployer account: _________________
-- [ ] Accounts file: ____________________
-- [ ] Multisig label: ___________________
-- [ ] Quorum: ________
-- [ ] Signers (comma-separated): ________
-- [ ] Counter initial value: ____________
+## Metadata
 
-## Checks (pre-deploy)
+- Date:
+- Network:
+- RPC:
+- Deployer account:
+- Accounts file:
+- Multisig label:
+- Quorum:
+- Signers:
+- Counter initial value:
+
+## Pre-deploy checks
 
 - [ ] Chain id matches target network.
 - [ ] Signers list is correct and funded.
@@ -20,31 +23,31 @@
 
 ## Declare classes
 
-- [ ] Multisig class hash: ______________________________
-- [ ] Multisig declare tx: ______________________________
-- [ ] Counter class hash: _______________________________
-- [ ] Counter declare tx: _______________________________
+- Multisig class hash:
+- Multisig declare tx:
+- Counter class hash:
+- Counter declare tx:
 
 ## Deploy instances
 
 Multisig instance:
-- [ ] Label: ______________________________
-- [ ] Address: ____________________________
-- [ ] Deploy tx: __________________________
-- [ ] Quorum: ________
-- [ ] Signers: ____________________________
+- Label:
+- Address:
+- Deploy tx:
+- Quorum:
+- Signers:
 
 Optional additional multisig instance:
-- [ ] Label: ______________________________
-- [ ] Address: ____________________________
-- [ ] Deploy tx: __________________________
-- [ ] Quorum: ________
-- [ ] Signers: ____________________________
+- Label:
+- Address:
+- Deploy tx:
+- Quorum:
+- Signers:
 
 Example Counter:
-- [ ] Address: ______________________________
-- [ ] Deploy tx: ____________________________
-- [ ] Initial value: ________
+- Address:
+- Deploy tx:
+- Initial value:
 
 ## Post-deploy verification
 

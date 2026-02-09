@@ -144,5 +144,6 @@ Rehearsal complete
 - final_counter_value: $FINAL_VALUE
 - wrote: $OUT_FILE
 
-Fill out workbook/20-rehearsal-counter.md and add a run log in workbook/runs/.
+Fill out workbook/20-rehearsal-counter.md (run log template) and add a run log in workbook/runs/.
+See ops/runbooks/lane1-rehearsal-counter.md for the procedure.
 REPORT
