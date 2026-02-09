@@ -35,6 +35,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Resolve run id
+        id: run
+        run: |
+          if [ -n "${{ inputs.run_id }}" ]; then
+            echo "run_id=${{ inputs.run_id }}" >> $GITHUB_OUTPUT
+          else
+            echo "run_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup Scarb
         uses: software-mansion/setup-scarb@v1
 
@@ -47,25 +56,41 @@ jobs:
       - name: Test
         run: snforge test
 
+      - name: Plan (lane1)
+        run: |
+          NETWORK="${{ inputs.network }}" \
+          LANE="${{ inputs.lane }}" \
+          RUN_ID="${{ steps.run.outputs.run_id }}" \
+          ops/tools/plan.sh
+
+      - name: Check (lane1)
+        run: |
+          NETWORK="${{ inputs.network }}" \
+          LANE="${{ inputs.lane }}" \
+          RUN_ID="${{ steps.run.outputs.run_id }}" \
+          ops/tools/check.sh
+
       - name: Generate bundle
         id: bundle
         run: |
           NETWORK="${{ inputs.network }}" \
           LANE="${{ inputs.lane }}" \
-          RUN_ID="${{ inputs.run_id }}" \
+          RUN_ID="${{ steps.run.outputs.run_id }}" \
+          INTENT_TEMPLATE="artifacts/${{ inputs.network }}/current/intents/intent.${{ steps.run.outputs.run_id }}.json" \
+          CHECKS_TEMPLATE="artifacts/${{ inputs.network }}/current/checks/checks.${{ steps.run.outputs.run_id }}.json" \
           ops/tools/bundle.sh
 
       - name: Upload bundle artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ops-bundle-${{ inputs.network }}-${{ steps.bundle.outputs.run_id }}
-          path: bundles/${{ inputs.network }}/${{ steps.bundle.outputs.run_id }}
+          name: ops-bundle-${{ inputs.network }}-${{ steps.run.outputs.run_id }}
+          path: bundles/${{ inputs.network }}/${{ steps.run.outputs.run_id }}
 
       - name: Open PR with bundle
         if: inputs.open_pr == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "ops: add bundle ${{ steps.bundle.outputs.run_id }} (${{ inputs.network }})"
-          title: "ops: add bundle ${{ steps.bundle.outputs.run_id }} (${{ inputs.network }})"
-          branch: "ops/bundle-${{ inputs.network }}-${{ steps.bundle.outputs.run_id }}"
-          add-paths: bundles/${{ inputs.network }}/${{ steps.bundle.outputs.run_id }}
+          commit-message: "ops: add bundle ${{ steps.run.outputs.run_id }} (${{ inputs.network }})"
+          title: "ops: add bundle ${{ steps.run.outputs.run_id }} (${{ inputs.network }})"
+          branch: "ops/bundle-${{ inputs.network }}-${{ steps.run.outputs.run_id }}"
+          add-paths: bundles/${{ inputs.network }}/${{ steps.run.outputs.run_id }}

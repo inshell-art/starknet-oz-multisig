@@ -7,6 +7,7 @@ LANE="${LANE:-}"
 RUN_ID="${RUN_ID:-}"
 POLICY_TEMPLATE="${POLICY_TEMPLATE:-}"
 INTENT_TEMPLATE="${INTENT_TEMPLATE:-}"
+CHECKS_TEMPLATE="${CHECKS_TEMPLATE:-}"
 FORCE="${FORCE:-0}"
 
 if [[ -z "$NETWORK" || -z "$LANE" ]]; then
@@ -69,7 +70,7 @@ CHECKS_JSON="$BUNDLE_DIR/checks.json"
 MANIFEST_JSON="$BUNDLE_DIR/bundle_manifest.json"
 
 export NETWORK LANE RUN_ID GIT_COMMIT GIT_DIRTY CREATED_AT
-export POLICY_TEMPLATE INTENT_TEMPLATE BUNDLE_DIR
+export POLICY_TEMPLATE INTENT_TEMPLATE CHECKS_TEMPLATE BUNDLE_DIR
 export RUN_JSON POLICY_JSON INTENT_JSON CHECKS_JSON MANIFEST_JSON
 
 python3 - <<'PY'
@@ -151,18 +152,34 @@ required = policy.get("lanes", {}).get(lane, {}).get("required_checks")
 if required is None:
     required = policy.get("lane_defaults", {}).get("required_checks", [])
 
-checks = {
-    "checks_version": "1",
-    "network": os.environ["NETWORK"],
-    "lane": lane,
-    "required_checks": required,
-    "checks": [
-        {"name": "bundle_manifest", "status": "pending", "details": "manifest not yet generated"}
-    ],
-    "status": "pending",
-    "generated_at": os.environ["CREATED_AT"],
-    "notes": "CI-generated placeholder. Populate required checks before approval/apply."
-}
+checks_template = os.environ.get("CHECKS_TEMPLATE")
+if checks_template:
+    checks = json.loads(Path(checks_template).read_text())
+else:
+    checks = {
+        "checks_version": "1",
+        "network": os.environ["NETWORK"],
+        "lane": lane,
+        "required_checks": required,
+        "checks": [
+            {"name": "bundle_manifest", "status": "pending", "details": "manifest not yet generated"}
+        ],
+        "status": "pending",
+        "generated_at": os.environ["CREATED_AT"],
+        "notes": "CI-generated placeholder. Populate required checks before approval/apply."
+    }
+
+checks.setdefault("checks_version", "1")
+checks.setdefault("network", os.environ["NETWORK"])
+checks.setdefault("lane", lane)
+checks.setdefault("required_checks", required)
+checks.setdefault("generated_at", os.environ["CREATED_AT"])
+
+if checks["network"] != os.environ["NETWORK"]:
+    raise SystemExit("checks.json network mismatch")
+if checks["lane"] != lane:
+    raise SystemExit("checks.json lane mismatch")
+
 Path(os.environ["CHECKS_JSON"]).write_text(json.dumps(checks, indent=2, sort_keys=True) + "\n")
 PY
 
