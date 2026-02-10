@@ -1,21 +1,6 @@
 # Runbook: OZ Multisig Wallet
 
-This runbook is the **execution checklist**. The **lane policy** lives in `opsec-ops-lanes-template/docs/ops-lanes-agent.md`.
-
-## Ops-lanes template sync (canonical source)
-
-The canonical docs live in the template repo (`opsec-ops-lanes-template`). This repo consumes them via **git subtree**.
-To refresh the subtree when the template updates:
-
-```
-make -f ops/Makefile subtree-update
-```
-
-Manual equivalent:
-
-```
-git subtree pull --prefix opsec-ops-lanes-template https://github.com/inshell-art/opsec-ops-lanes-template.git main --squash
-```
+This runbook is the **execution checklist**. The **lane policy** lives in `ops/policy/`.
 
 ## Lane selection (first decision)
 
