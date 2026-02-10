@@ -1,0 +1,121 @@
+{
+  "lane_defaults": {
+    "allowed_ops": [],
+    "apply_allowed": false,
+    "require_approval": false,
+    "required_checks": [
+      "bundle_manifest"
+    ]
+  },
+  "lanes": {
+    "lane0": {
+      "allowed_ops": [
+        "read"
+      ],
+      "apply_allowed": false,
+      "require_approval": false,
+      "required_checks": []
+    },
+    "lane1": {
+      "allowed_ops": [
+        "plan"
+      ],
+      "apply_allowed": false,
+      "require_approval": false,
+      "required_checks": [
+        "bundle_manifest"
+      ]
+    },
+    "lane2": {
+      "allowed_ops": [
+        "declare",
+        "deploy"
+      ],
+      "apply_allowed": true,
+      "require_approval": true,
+      "required_checks": [
+        "bundle_manifest",
+        "chain_id",
+        "signer",
+        "target_identity",
+        "preconditions",
+        "simulation"
+      ]
+    },
+    "lane3": {
+      "allowed_ops": [
+        "invoke"
+      ],
+      "apply_allowed": true,
+      "require_approval": true,
+      "required_checks": [
+        "bundle_manifest",
+        "chain_id",
+        "signer",
+        "target_identity",
+        "preconditions",
+        "postconditions"
+      ]
+    },
+    "lane4": {
+      "allowed_ops": [
+        "invoke"
+      ],
+      "apply_allowed": true,
+      "require_approval": true,
+      "required_checks": [
+        "bundle_manifest",
+        "chain_id",
+        "signer",
+        "role_membership",
+        "bounds",
+        "postconditions"
+      ]
+    },
+    "lane5": {
+      "allowed_ops": [
+        "invoke",
+        "upgrade"
+      ],
+      "apply_allowed": true,
+      "require_approval": true,
+      "required_checks": [
+        "bundle_manifest",
+        "chain_id",
+        "signer",
+        "target_identity",
+        "preconditions",
+        "postconditions",
+        "multisig_threshold"
+      ]
+    },
+    "lane6": {
+      "allowed_ops": [
+        "invoke",
+        "pause",
+        "freeze"
+      ],
+      "apply_allowed": true,
+      "require_approval": true,
+      "required_checks": [
+        "bundle_manifest",
+        "chain_id",
+        "signer",
+        "target_identity",
+        "preconditions",
+        "postconditions"
+      ]
+    }
+  },
+  "network_allowlist": [
+    "sepolia",
+    "mainnet",
+    "devnet"
+  ],
+  "policy_version": "1",
+  "snapshot": {
+    "created_at": "2026-02-10T10:43:25.561097+00:00",
+    "lane": "lane0",
+    "network": "sepolia"
+  }
+}

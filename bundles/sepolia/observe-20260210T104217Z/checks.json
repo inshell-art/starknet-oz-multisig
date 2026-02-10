@@ -1,0 +1,17 @@
+{
+  "checks": [
+    {
+      "details": "manifest hash recorded at bundle time",
+      "name": "bundle_manifest",
+      "status": "pass"
+    }
+  ],
+  "checks_version": "1",
+  "generated_at": "2026-02-10T10:43:25.522641+00:00",
+  "lane": "lane0",
+  "missing_required_checks": [],
+  "network": "sepolia",
+  "notes": "Plan/check placeholder. Populate required checks before approval/apply.",
+  "required_checks": [],
+  "status": "pass"
+}
