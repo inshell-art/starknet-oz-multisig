@@ -2,11 +2,15 @@
 
 This template is designed to be *imported* into one or more business repos without copying secrets.
 
-See also: `codex/BUSINESS_REPO_ADOPTION.md` for a short adoption checklist.
+See also:
+- `codex/BUSINESS_REPO_ADOPTION.md` for a short adoption checklist.
+- `docs/downstream-ops-contract.md` for the required CI/CD rules.
+- `docs/pipeline-reference.md` for the step-by-step pipeline.
 
 ## Scaffold example
 
 See `examples/scaffold/` for a minimal downstream repo layout and CI rehearsal stub (plan + check only).
+An optional bundle workflow example is included for teams that want deterministic bundles.
 
 ## Recommended structure
 
